@@ -7,6 +7,7 @@ from ray.rllib.policy.policy import Policy
 from ray.rllib.policy.sample_batch import SampleBatch
 from ray.rllib.utils.annotations import DeveloperAPI
 from ray.rllib.utils.typing import AgentID
+import torch
 
 
 class Postprocessing:
@@ -46,9 +47,14 @@ def compute_advantages(rollout: SampleBatch,
         "Can't use gae without using a value function"
 
     if use_gae:
-        vpred_t = np.concatenate(
-            [rollout[SampleBatch.VF_PREDS],
-             np.array([last_r])])
+        if torch.is_tensor(last_r):
+            vpred_t = np.concatenate(
+                [rollout[SampleBatch.VF_PREDS],
+                 np.array([last_r.cpu()])])
+        else:
+            vpred_t = np.concatenate(
+                [rollout[SampleBatch.VF_PREDS],
+                 np.array([last_r])])
         delta_t = (
             rollout[SampleBatch.REWARDS] + gamma * vpred_t[1:] - vpred_t[:-1])
         # This formula for the advantage comes from:

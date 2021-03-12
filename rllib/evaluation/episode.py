@@ -1,3 +1,4 @@
+import uuid
 from collections import defaultdict
 import numpy as np
 import random
@@ -61,7 +62,7 @@ class MultiAgentEpisode:
             batch_builder_factory()
         self.total_reward: float = 0.0
         self.length: int = 0
-        self.episode_id: int = random.randrange(2e9)
+        self.episode_id: int = uuid.uuid4().int
         self.env_id = env_id
         self.agent_rewards: Dict[AgentID, float] = defaultdict(float)
         self.custom_metrics: Dict[str, float] = {}
